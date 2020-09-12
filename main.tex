@@ -1,0 +1,126 @@
+\documentclass[11pt]{article}
+
+\usepackage{fullpage}
+\usepackage{epsfig}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amstext}
+\usepackage{amsmath}
+\usepackage{xspace}
+\usepackage{theorem}
+\usepackage{tabu,multirow}
+\usepackage{graphicx}
+\usepackage{color} 
+\makeatletter
+\setlength{\textwidth}{6.5in}
+\setlength{\oddsidemargin}{0in}
+\setlength{\evensidemargin}{0in}
+\setlength{\topmargin}{0.25in}
+\setlength{\textheight}{8.25in}
+\setlength{\headheight}{0pt}
+\setlength{\headsep}{0pt}
+\setlength{\marginparwidth}{59pt}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt plus 1pt}
+\setlength{\theorempreskipamount}{5pt plus 1pt}
+\setlength{\theorempostskipamount}{0pt}
+\setlength{\abovedisplayskip}{8pt plus 3pt minus 6pt}
+
+\renewcommand{\section}{\@startsection{section}{1}{0mm}%
+                                 {2ex plus -1ex minus -.2ex}%
+                                 {1.3ex plus .2ex}%
+                                 {\normalfont\Large\bfseries}}%
+\renewcommand{\subsection}{\@startsection{subsection}{2}{0mm}%
+                                   {1ex plus -1ex minus -.2ex}%
+                                   {1ex plus .2ex}%
+                                   {\normalfont\large\bfseries}}%
+\renewcommand{\subsubsection}{\@startsection{subsubsection}{3}{0mm}%
+                                   {1ex plus -1ex minus -.2ex}%
+                                   {1ex plus .2ex}%
+                                   {\normalfont\normalsize\bfseries}}
+\renewcommand\paragraph{\@startsection{paragraph}{4}{0mm}%
+                                  {1ex \@plus1ex \@minus.2ex}%
+                                  {-1em}%
+                                  {\normalfont\normalsize\bfseries}}
+\renewcommand\subparagraph{\@startsection{subparagraph}{5}{\parindent}%
+                                     {2.0ex \@plus1ex \@minus .2ex}%
+                                     {-1em}%
+                                    {\normalfont\normalsize\bfseries}}
+\makeatother
+
+\newenvironment{proof}{{\bf Proof:  }}{\hfill\rule{2mm}{2mm}}
+\newenvironment{proofof}[1]{{\bf Proof of #1:  }}{\hfill\rule{2mm}{2mm}}
+\newenvironment{proofofnobox}[1]{{\bf#1:  }}{}
+\newenvironment{example}{{\bf Example:  }}{\hfill\rule{2mm}{2mm}}
+\renewcommand{\thesection}{\lecnum.\arabic{section}}
+
+\renewcommand{\theequation}{\thesection.\arabic{equation}}
+\renewcommand{\thefigure}{\thesection.\arabic{figure}}
+
+\newtheorem{fact}{Fact}[section]
+\newtheorem{lemma}[fact]{Lemma}
+\newtheorem{theorem}[fact]{Theorem}
+\newtheorem{definition}[fact]{Definition}
+\newtheorem{corollary}[fact]{Corollary}
+\newtheorem{proposition}[fact]{Proposition}
+\newtheorem{claim}[fact]{Claim}
+\newtheorem{exercise}[fact]{Exercise}
+
+% math notation
+\newcommand{\R}{\ensuremath{\mathbb R}}
+\newcommand{\Z}{\ensuremath{\mathbb Z}}
+\newcommand{\N}{\ensuremath{\mathbb N}}
+\newcommand{\F}{\ensuremath{\mathcal F}}
+\newcommand{\SymGrp}{\ensuremath{\mathfrak S}}
+\newcommand{\pr}{{\bf {\rm Pr}}}
+
+\newcommand{\CCP}{\ensuremath{\sf P}}
+\newcommand{\CCNP}{\ensuremath{\sf NP}}
+\newcommand{\C}{\ensuremath{\mathcal C}}
+
+\newcommand{\size}[1]{\ensuremath{\left|#1\right|}}
+\newcommand{\ceil}[1]{\ensuremath{\left\lceil#1\right\rceil}}
+\newcommand{\floor}[1]{\ensuremath{\left\lfloor#1\right\rfloor}}
+\newcommand{\poly}{\operatorname{poly}}
+\newcommand{\polylog}{\operatorname{polylog}}
+
+% some abbreviations
+\newcommand{\e}{\varepsilon}
+\newcommand{\half}{\ensuremath{\frac{1}{2}}}
+\newcommand{\junk}[1]{}
+\newcommand{\sse}{\subseteq}
+\newcommand{\union}{\cup}
+\newcommand{\meet}{\wedge}
+
+\newcommand{\prob}[1]{\ensuremath{\text{{\bf Pr}$\left[#1\right]$}}}
+\newcommand{\expct}[1]{\ensuremath{\text{{\bf E}$\left[#1\right]$}}}
+\newcommand{\Event}{{\mathcal E}}
+
+\newcommand{\mnote}[1]{\normalmarginpar \marginpar{\tiny #1}}
+
+\newcommand{\headings}[4]{
+\noindent
+\fbox{\parbox{\textwidth}{
+{\bf CS787: Advanced Algorithms} \hfill {{\bf Scribe:} #3}
+\vspace{0.02in}
+{{\bf Lecture #1:} #2} \hfill {{\bf Date:} #4}
+}}
+\vspace{0.2in}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Document begins here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+
+%% Fill in lecture number, topic, your name, and date of lecture below. %%
+
+\newcommand{\lecnum}{XX}
+\headings{\lecnum}{Lecture Title}{Scribe Name }{Date of Lecture}
+
+%% Scribe the lecture below
+
+\end{document}
