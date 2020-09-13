@@ -11,6 +11,8 @@
 \usepackage{tabu,multirow}
 \usepackage{graphicx}
 \usepackage{color} 
+\usepackage{hyperref}
+\usepackage{bbm}
 \makeatletter
 \setlength{\textwidth}{6.5in}
 \setlength{\oddsidemargin}{0in}
@@ -20,7 +22,6 @@
 \setlength{\headheight}{0pt}
 \setlength{\headsep}{0pt}
 \setlength{\marginparwidth}{59pt}
-
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{5pt plus 1pt}
 \setlength{\theorempreskipamount}{5pt plus 1pt}
@@ -74,6 +75,8 @@
 \newcommand{\F}{\ensuremath{\mathcal F}}
 \newcommand{\SymGrp}{\ensuremath{\mathfrak S}}
 \newcommand{\pr}{{\bf {\rm Pr}}}
+\newcommand{\expc}{{\bf {\rm E}}}
+\newcommand{\var}{{\bf {\rm Var}}}
 
 \newcommand{\CCP}{\ensuremath{\sf P}}
 \newcommand{\CCNP}{\ensuremath{\sf NP}}
@@ -84,6 +87,7 @@
 \newcommand{\floor}[1]{\ensuremath{\left\lfloor#1\right\rfloor}}
 \newcommand{\poly}{\operatorname{poly}}
 \newcommand{\polylog}{\operatorname{polylog}}
+\newcommand*{\QEDB}{\null\nobreak\hfill\ensuremath{\square}}
 
 % some abbreviations
 \newcommand{\e}{\varepsilon}
@@ -96,6 +100,7 @@
 \newcommand{\prob}[1]{\ensuremath{\text{{\bf Pr}$\left[#1\right]$}}}
 \newcommand{\expct}[1]{\ensuremath{\text{{\bf E}$\left[#1\right]$}}}
 \newcommand{\Event}{{\mathcal E}}
+\newcommand{\bigo}{\mathcal{O}}
 
 \newcommand{\mnote}[1]{\normalmarginpar \marginpar{\tiny #1}}
 
@@ -118,9 +123,260 @@
 
 %% Fill in lecture number, topic, your name, and date of lecture below. %%
 
-\newcommand{\lecnum}{XX}
-\headings{\lecnum}{Lecture Title}{Scribe Name }{Date of Lecture}
+\newcommand{\lecnum}{2}
+\headings{\lecnum}{Hashing}{Ryan Moreno}{9/8/2020}
 
 %% Scribe the lecture below
+\section{Last Time}
+\begin{itemize}
+\item
+\textbf{Hashing:} Given a set of $n$ numbers $S$ and a very large universe $U$ such that
+    \[S \subseteq U = \{1, ..., |U|\}\]
+    \[S \ll U\]
+    
+we want to be able to quickly check whether some number $x \in S$ for any $x \in U$. 
+
+\begin{itemize}
+\item
+Solution: we will develop a hash function $\mathrm{f}: U \rightarrow [m]$ and store each element $y \in S$ in position $\mathrm{f}(y)$ in an array $A$ with $m$ slots. This way, for some $x \in U$, we can compute $\mathrm{f}(x)$ to check if $x \in S$.
+\item It is impractical for $\mathrm{f}$ to be ``completely random,'' so we will choose $\mathrm{f}$ from a universal hash family.
+\end{itemize}
+
+\item 
+\textbf{Markov's Inequality:} $\pr[x \geq t] \leq \frac{\expc[x]}{t}$ if $x$ is a non-negative random variable and $t > 0$
+
+\item
+\label{recap:UHF}
+\textbf{Universal Hash Family (UHF):} $\forall {\underset{x \neq y}{x, y \in U}} \;
+ ({\underset{\mathrm{f}\sim\ U(\mathrm{F})}{\pr}}[\mathrm{f}(x) = \mathrm{f}(y)] \leq \frac{1}{m})$
+ 
+\begin{itemize}
+    \item 
+    Expected number of collisions: $\frac{{n \choose 2}}{m}$
+    
+    \item 
+    When $m = n^2$, there will be no collisions with probability $\geq \frac{1}{2}$ (by Markov's Inequality).
+    
+    \item \textbf{Example of a UHF}: $\mathrm{H} = \pmb{ \{ }h_{ab} | a \in \{1, ... , p-1\}, b \in \{0, ..., p-1\}  \pmb{ \} }$ s.t.
+    \[p \text{ is prime and }p > |U|\]
+    \[h_{ab} = ((ax+b) \mod p)\mod m\]
+    
+\end{itemize}
+
+\end{itemize}
+
+\section{Universal Hash Family Example}
+\subsection{Proof}
+Here we will prove that $\mathrm{H}$ is a UHF.
+
+Fix $x, y \in U$ with $x \neq y$.
+
+Claim: For any $c, d \in \{0, ..., p-1\}$ such that $c \neq d$ there exists unique $a \in \{1, ..., p-1\}$ and $b \in \{0, ..., p-1\}$ such that $(ax+b) = c \mod p$ and $(ay+b) = d \mod p$.
+In other words, there is a 1-to-1 mapping between the parameters $a, b$ and the result $c, d$. 
+This claim allows us to state
+\[
+{\underset{\substack{a\sim\ U(\{1, ..., p-1\}) \\ b\sim\ U(\{0, ..., p-1\})}}{\pr}} [\mathrm{h}_{ab}(x) = \mathrm{h}_{ab}(y)] = 
+{\underset{\substack{c\sim\ U(\{0, ..., p-1\}) \\ d\sim\ U(\{0, ..., p-1\}) \\ c \neq d}}{\pr}} [c = d \mod m] 
+\]
+because picking $a$ and $b$ at random is equivalent to picking $c$ and $d$ at random.
+
+We use counting techniques to compute the probability of the right-side expression. The total number of possibile assignments of $c, d$ is $p(p-1)$ because we have the constraint $c \neq d$. The number of assignments resulting in a collision in which $c = d\mod m$ is $p \floor{\frac{p-1}{m}}$ because there are $p$ choices for $c$, leaving $\left \lfloor{\frac{p-1}{m}}\right \rfloor$ choices for $d$ in order to ensure that $d = c \mod m$. 
+\[
+{\underset{\substack{c\sim\ U(\{0, ..., p-1\}) \\ d\sim\ U(\{0, ..., p-1\}) \\ c \neq d}}{\pr}} [c = d \mod m] =
+\frac{p \floor{\frac{p-1}{m}}}{p(p-1)} \leq \frac{1}{m}
+\]
+
+Thus, we have 
+\[
+{\underset{\substack{a\sim\ U(\{1, ..., p-1\}) \\ b\sim\ U(\{0, ..., p-1\})}}{\pr}} [\mathrm{h}_{ab}(x) = \mathrm{h}_{ab}(y)] \leq \frac{1}{m}
+\]
+By definition, this means that $\mathrm{H}$ is a UHF. 
+
+\QEDB
+
+\subsection{Notes}
+\begin{itemize}
+    \item 
+    We don't need to store an explicit mapping from elements in the universe to an index in the array. Instead, we just store $a$ and $b$.
+    
+    \item 
+    Our example UHF satisfies the property that two elements map to the same location with probability $\leq \frac{1}{m}$, which means that there is probability $\geq \frac{1}{2}$ that there will be no collisions (by Markov's Inequality) when $m = n^2$.
+    
+    \item
+    The space requirement to guarantee no collisions is quadratic wrt the number of elements in $S$. We cannot be more efficient than this, meaning that we \textit{need} an array of size $m = n^2$. If we use an array of size $m \leq n^{2-\epsilon}$, there will be a high probability of collisions (not proven in class).
+    
+\end{itemize}
+
+\section{Two-Level Hashing}
+Note that if we use the previous hashing solution and choose $m = \bigo(n)$ then we expect many collisions. In particular, $\expc[C] = \frac{n-1}{2}$. 
+
+Two-level hashing provides a new solution that takes $\bigo(n)$ space while retaining $\bigo(1)$ lookup speed and a low probability of any collisions. 
+
+\subsection{Description}
+The procedure is as follows:
+\begin{itemize}
+    \item Allocate a size $m = \bigo(n)$ size first-level array and use a hash function to map the elements in $S$ to indices in the this array.
+    \item Let $s_i$ be the number of elements that get mapped to position $i$ in the first-level array. For each index $i$ in the first-level array, create a smaller, second-level array of size $s_i^2$ and point to this second-level array from position $i$ of the first-level array.
+    \item For each position $i$ in the first-level array, use a second hash function $h_i$ to hash each element in $s_i$ to a position in the second-level array.
+\end{itemize}
+
+Note that the first-level hash function is allowed to have any number of collisions because the collisions are addressed by the second-level arrays. For each second-level hash function $h_i$, the probability of getting no collisions is $\geq \frac{1}{2}$ because we chose an array of size $\bigo(s_i^2)$ (as proven in last lecture and stated in ~\ref{recap:UHF}).
+
+\subsection{Proof of space requirement}
+We now show that the two-level hashing arrangement only uses $\bigo(n)$ space.
+
+Assuming the first-level array is size $m = n$, The size of all of the second-level arrays combined can be calculated as $\sum_{i=1}^{n}s_i^2$. Let $\mathbbm{1}_{j \rightarrow i}$ be an indicator variable for element $j$ mapping to position $i$.
+
+\begin{align*}
+\expc\left[\sum_{i=1}^{n}s_i^2\right] &= \expc\left[\sum_{i=1}^{n} \sum_{j=1}^{n} (\mathbbm{1}_{j \rightarrow i})^2\right] \\
+&= \expc\left[\sum_{i=1}^{n} \sum_{j=1}^{n} \sum_{k=1}^{n} (\mathbbm{1}_{j \rightarrow i})(\mathbbm{1}_{k \rightarrow i})\right] \\
+&= \expc\left[\sum_{j=1}^{n} \sum_{k=1}^{n} \mathbbm{1}_{\text{elements $j$ and $k$ collide}}\right] \\
+&= (\text{number of times $j \neq k$ })(\text{probability that $j$ collides with $k$ when $j \neq k$}) \; + \\
+& \; \; \; \; \;(\text{number of times $j = k$})(\text{probability that $j$ collides with $k$ when $j = k$}) \\
+&= (n^2 - n)\frac{1}{m} + n \cdot 1 \\
+&= (n^2 - n)\frac{1}{n} + n \cdot 1 \\
+\expc\left[\sum_{i=1}^{n}s_i^2\right] &= 2n - 1
+\end{align*}
+Therefore, using a two-level hashing function with $m=n$, the total space is $n + 2n - 1 = \bigo(n)$.
+\QEDB
+
+\subsection{Implementation Notes}
+\begin{itemize}
+    \item 
+    Note that by Markov's inequality, $\pr \pmb{[}\expc\left[\sum_{i=1}^{n}s_i^2\right] \geq 4n\pmb{]} \leq \frac{2n-1}{4n} \leq \frac{1}{2}$. So, we should only have to try a small number of hash functions in order to get a total second-level size < $4n$.
+    Then, for each second-level array we should only have to try a small number of hash functions until we get one with no collisions (since for each $h_i$ $\pr[\text{no collisions}] > \frac{1}{2}$.
+    
+    \item
+    Note also that this solution is for a static data structure (meaning that we know $S$ when we create the two-level hash table). We must know $S$ because we need to know the value $s_i$ (how many elements map to position $i$ in the first-level array) for each value of $i$.
+    
+    \item
+    Note that we also need $\log{|U|}$ bits for each position in the second-level arrays because we need to store the value $x \in S$ that maps to a given position. We need to store the values (rather than merely storing a boolean value) because we only prevented collisions between two values in $S$. If you hash a value $y$ to position $i$ where $y \in U$ and $y \notin S$, it could collide with a value $x \in S$ also hashed to $i$. In this case, when we hash $y$ it would be imperative to compare the value $y$ to the value stored in position $i$.
+\end{itemize}
+
+\section{Balls and Bins Example}
+\subsection{Definition}
+In this example, we have $n$ balls and $n$ bins. We throw balls into bins at random.
+
+In expectation, every bin receives 1 ball. Let $i \rightarrow j$ represent the event that ball $i$ is thrown into bin $j$ and let $Z_j$ represent the number of balls in bin $j$. We calculate the expected value of $Z_j$ as follows:
+\[ \expc[Z_j] = \expc\left[\sum_{i=1}^{n} \mathbbm{1}_{i \rightarrow j}\right] = \sum_{i=1}^{n} \pr[i \rightarrow j] = n \cdot \frac{1}{n} = 1 \]
+
+\subsection{Markov's Inequality}
+\subsubsection{Statement of Markov's Inequality}
+$\pr[x \geq t] \leq \frac{\expc[x]}{t}$ if $x$ is a non-negative random variable and $t > 0$.
+
+\subsubsection{Application}
+By Markov's Inequality, we can bound the probability that a particular bin $j$ has more than $k$ balls in it: $\pr[Z_j \geq k] \leq \frac{1}{k}$.
+
+Now we attempt to bound the probability that any bin has more than $k$ balls.
+\[ \pr[\exists j: Z_j \geq k] \leq \sum_{j=1}^{n} \pr[Z_j \geq k] \leq n \cdot \frac{1}{k} = \frac{n}{k} \]
+Since it is impossible for there to be more than $k$ balls in a bin, we know that $k \leq n$. This leads to a trivial bound since we are bounding the probability by a value that is at least 1.
+
+\subsection{Chebyshev's Inequality}
+\subsubsection{Statement of Chebyshev's Inequality}
+$\pr \left \pmb{[} |x - \expc[x]| \geq k \sigma \right \pmb{]} \leq \frac{1}{k^2}$ if $x$ is a random variable with $\var[x] = \sigma^2$.
+
+Note that in order to use Chebyshev's Inequality, we need to know the variance of $x$.
+
+\subsubsection{Proof}
+Let $\mu = \expc[x]$. We begin with the left-hand side of Chebyshev's Inequality
+
+ \[ \pr \left \pmb{[} |x - \mu| \geq k \sigma \right \pmb{]} = \pr \left \pmb{[} (x - \mu)^2 \geq (k \sigma)^2 \right \pmb{]} \]
+
+Recall that $\var[x] = \sigma^2 = \expc[(x - \mu)^2]$.
+
+\[ \pr \left \pmb{[} |x - \mu| \geq k \sigma \right \pmb{]} = \pr \left \pmb{[} (x - \mu)^2 \geq k^2 \cdot \expc[(x - \mu)^2] \right \pmb{]} \]
+
+Define $z = (x - \mu)^2$.
+
+\[ \pr \left \pmb{[} |x - \mu| \geq k \sigma \right \pmb{]} = \pr \left \pmb{[} z \geq k^2 \cdot \expc[z] \right \pmb{]} \]
+
+Applying Markov's Inequality we get,
+
+\[ \pr \left \pmb{[} |x - \mu| \geq k \sigma \right \pmb{]} \leq \frac{\expc[z]}{k^2 \cdot \expc[z]} = \frac{1}{k^2} \]
+
+\QEDB
+
+\subsubsection{Application}
+We now return to attempting to bound the probability that any bin has at least $k$ balls in it.
+
+In order to use Chebyshev's Inequality we need to calculate the variance of $Z_j$ (the number of balls placed in bin $j$).
+
+Because each ball is placed independently,
+\[ \var(Z_j) = \var(\sum_{i=1}^{n} Var(\mathbbm{1}_{i \rightarrow j})) \]
+
+By the definition of variance,
+\[ \var(Z_j) = n \cdot (\exp\pmb{[}(\mathbbm{1}_{i \rightarrow j})^2\pmb{]} - (\exp\pmb{[}\mathbbm{1}_{i \rightarrow j}  \pmb{]})^2) \]
+
+Note that $\mathbbm{1}_{i \rightarrow j}$ is either 1 or 0, so $(\mathbbm{1}_{i \rightarrow j})^2 = \mathbbm{1}_{i \rightarrow j} = \frac{1}{n}$ (since a ball is placed in a bin uniformly at random).
+\[ \var(Z_j) = n[\frac{1}{n} - (\frac{1}{n})^2] = 1 - \frac{1}{n} < 1 \]
+
+So, $\sigma = \sqrt{\var(Z_j)} < 1$. By Chebyshev's Inequality,
+
+\[ \pr [|Z_j] - \exp[Z_j]| \geq k \cdot \sigma] \leq \frac{1}{k^2} \]
+
+Since $\exp[Z_j] = 1$,
+
+\[ \Pr [Z_j \geq k+1] \leq \frac{1}{k^2} \]
+
+Substituting $k' = k+1$, we get
+\[ \Pr [Z_j \geq k'] \leq \frac{1}{(k' - 1)^2} \]
+
+This yields the bound we were hoping for:
+\[ \Pr [\exists j: Z_j \geq k'] \leq \frac{n}{(k' - 1)^2} \]
+
+If we choose $k = \bigo(\sqrt{n})$, then with constant probability, no bin has more than $\sqrt{n}$ balls.
+
+As an aside, if the hashing function was perfectly random, then the max load would be $\bigo(\log n)$ instead of \bigo($\sqrt{n})$.
+
+\section{Chernoff Bound}
+\subsubsection{Statement of Chernoff Bound}
+Let $x = \sum_{i=0}^{n} x_i$ where $x_i$ are independent random variables that take values in $\{0, 1\}$ and $\exp[x] = \mu$. Then $\pr[x \geq (1+\varepsilon)\mu] \leq \left(\frac{e^\varepsilon}{(1+\varepsilon)^{1+\varepsilon}}\right)^\mu \leq e^{-\frac{\varepsilon^2 \mu}{2+\varepsilon}}$
+
+TODO: why second leq?
+
+Note that in order to use the Chernoff Bound, we need to know the independence of the random variables $x_i$ and the expectation of $x$.
+
+\subsubsection{Proof}
+Let $z = e^{tx}$. We will first calculate $\expc[z]$.
+\[ \expc[z] = \expc[e^{tx}] = \expc[e^{t \sum x_i}] = \expc\left[\prod e^{t x_i}\right] \]
+Since $x_i$ are independent,
+\[ \expc[z] = \prod \expc[e^{t x_i}] \]
+Let $P_i$ be the probability that $x_i = 1$.
+\[ \expc[z] = \prod ((1 - P_i)(e^{0 \cdot x_i}) + (P_i)(e^{t \cdot 1})) = \prod ((1)(e^0) + (P_i)(e^t - e^0)) = \prod (1 + P_i(e^t - 1)  \]
+For some reason (TODO),
+\[ \expc[z] \leq \prod e^{P_i(e^t - 1)} = e^{(\sum P_i)(e^t - 1)} = e^{\mu(e^t - 1)} \]
+Now we apply Markov's Inequality to the random variable $z = e^{tx}$ and substitue the value we calculated for $\expc[z]$.
+\[ \pr [e^{tx} \geq e^{t(1+\varepsilon)\mu}] \leq \frac{\expc[z]}{e^{t(1+\varepsilon)\mu}} \leq \frac{e^{\mu(e^t - 1)}}{e^{t(1+\varepsilon)\mu}} \]
+Note the following equivalences which result in the left-hand side of Chernoff's Bound:
+\[ \pr [e^{tx} \geq e^{t(1+\varepsilon)\mu}] = \pr [tx \geq t(1+\varepsilon)\mu] = \pr [x \geq (1+\varepsilon)\mu] \]
+Putting it all together and setting $t = \ln (1 + \varepsilon)$, we get 
+\[ \pr [x \geq (1+\varepsilon)\mu] \leq \frac{e^{\mu(e^t - 1)}}{e^{t(1+\varepsilon)\mu}}  = \frac{e^{\mu(e^t - 1)}}{e^{t(1+\varepsilon)\mu}}  = \frac{e^{\mu(e^{\ln (1 + \varepsilon)} - 1)}}{e^{\ln (1 + \varepsilon)(1+\varepsilon)\mu}} = \frac{e^{\mu(1 + \varepsilon - 1)}}{(1 + \varepsilon)e^{(1+\varepsilon)\mu}} = \left(\frac{e^\varepsilon}{(1+\varepsilon)^{1+\varepsilon}} \right)^\mu \]
+This proves the first portion of Chernoff's Bound. To complete the proof, we need to show that
+\[ \left(\frac{e^\varepsilon}{(1+\varepsilon)^{1+\varepsilon}}\right)^\mu \leq e^{-\frac{\varepsilon^2 \mu}{2+\varepsilon}} \]
+To begin, we will take the natural log of the left-hand side.
+\[ \left(\frac{e^\varepsilon}{(1+\varepsilon)^{1+\varepsilon}}\right)^\mu = \mu\pmb{[}\varepsilon - (1 + \varepsilon)\ln (1 + \varepsilon)\pmb{]} \]
+We claim the following inequality to be true when $\varepsilon > 0$: (TODO: so we need to define epsilon as positive??)
+\[ \ln (1 + \varepsilon) \geq \frac{\varepsilon}{1 + \frac{\varepsilon}{2}} \]
+Using this inequality we get
+\[ \mu \pmb{[}\varepsilon - (1 + \varepsilon)\ln (1 + \varepsilon)\pmb{]} \leq \mu \pmb{[}\varepsilon - (1 + \varepsilon)(\frac{\varepsilon}{1 + \frac{\varepsilon}{2}})\pmb{]} = \mu \pmb{[} \frac{\varepsilon(1 + \frac{\varepsilon}{2}) - \varepsilon - \varepsilon^2}{1 + \frac{\varepsilon}{2}}  \pmb{]} = \mu \pmb{[} \frac{-\frac{\varepsilon^2}{2}}{1 + \frac{\varepsilon}{2}}  \pmb{]} = - \mu \left[ \frac{\varepsilon^2}{2 + \varepsilon} \right] \]
+
+Putting it all together, we have 
+\[ \pr[x \geq (1+\varepsilon)\mu] \leq \left(\frac{e^\varepsilon}{(1+\varepsilon)^{1+\varepsilon}}\right)^\mu \leq e^{-\frac{\varepsilon^2 \mu}{2+\varepsilon}} \]
+
+\QEDB
+
+\subsubsection{Application}
+Returning again to the bin and ball problem, we will use Chernoff's Bound to bound the probability of any ball having $\geq k$ balls.
+
+Because $Z_j = \sum_{i=1}^{n} \mathbbm{1}_{i \rightarrow j}$, each ball placement is independent, and we know $\expc[Z_j] = \mu = 1$, we can apply Chernoff's Bound. Using $\varepsilon = k-1$ we get
+
+\[ \pr[Z_j \geq k] \leq  \frac{e^{k-1}}{k^k} = \frac{1}{e} (\frac{e}{k})^k \]
+
+Thus, we have 
+\[ \Pr [\exists j: Z_j \geq k'] \leq \frac{n}{e} (\frac{e}{k})^k \]
+
+Analyzing this expression asymptotically, we see that the probability that any bin has more than one ball drops at a rate of $\frac{1}{k^k}$. 
+
+If we choose $k= \log n$ then with good probability no bin will have $\log n$ balls in it. (TODO: why??)
 
 \end{document}
